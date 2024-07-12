@@ -10,6 +10,8 @@ int main(int argc, char** argv){
   std::cout<<"setting bins"<<std::endl;
   rep->setNbins(100); // number of bins from 0 to 20 GeV
 
+  rep->setInFile("/home/guang/work/theia/readyForCAF_neutrino_swap0.root");
+
   std::cout<<"setting file"<<std::endl;
   rep->setInFile(rep->getInfile());
 
@@ -24,11 +26,11 @@ int main(int argc, char** argv){
   rep->readSpectrum();
 
   std::cout<<"constructing data"<<std::endl;
-  std::vector<double> data_shift = {0.05,0.18};
+  std::vector<double> data_shift = {0.0,1.0};
   rep->constructData(data_shift);
 
   std::cout<<"testing mc"<<std::endl;
-  std::vector<double> mc_shift = {0.06,0.18};
+  std::vector<double> mc_shift = {0.01,1.01};
   std::vector<double> mc_test = rep->constructMC(mc_shift);
 
   std::cout<<"getting chi2"<<std::endl;

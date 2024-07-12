@@ -93,12 +93,12 @@ public:
   void constructData(std::vector<double> v);
   std::vector<double> constructMC(std::vector<double> v);
 
-  TFile* getInfile(){return infile;}
+  std::string getInfile(){return infilePath;}
   double getChi2(std::vector<double> v);
   double getPenalty(std::vector<double> v);
 
   void setNbins(double n) {nbin = n;}
-  void setInFile(TFile* file) {infile = file;}
+  void setInFile(std::string infile) {infilePath = infile;}
   void setPullNominal(std::vector<double> v){nominal = v;}
   void setPullUncertainty(std::vector<double> v){uncertainty = v;}
 
@@ -108,7 +108,7 @@ private:
 
   std::vector<double> fakeData;
   int nbin;
-  TFile* infile = new TFile("/home/guang/work/theia/FD_FHC_nonswap.root","READ");
+  std::string infilePath;
 
   std::vector<double> nominal;
   std::vector<double> uncertainty;
