@@ -30,11 +30,25 @@ int main(int argc, char** argv){
   rep->constructData(data_shift);
 
   std::cout<<"testing mc"<<std::endl;
-  std::vector<double> mc_shift = {0.01,1.01};
-  std::vector<double> mc_test = rep->constructMC(mc_shift);
+  //std::vector<double> mc_shift = {0.01,1.01};
+  //std::vector<double> mc_test = rep->constructMC(mc_shift);
 
+  TH2F* h2 = new TH2F("","#chi^{2} map; systematic a; systematic b", 100,0,1, 100,0.5,1.5);
   std::cout<<"getting chi2"<<std::endl;
-  double chi2 = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
+  for (int i = 0;i<100;i++){
+    for (int j = 0; j< 100; j++){
+      double ashift = i*0.01;
+      double bshift = 0.5 + j*0.01;
+      std::vector<double> mc_shift = {ashift,bshift};
+      std::vector<double> mc_test = rep->constructMC(mc_shift);
+      double chi2 = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
+      h2->SetBinContent(i+1, j+1, chi2);
+    }
+  }
+  TFile* outfile = new TFile("output.root","RECREATE");
+  h2->Write("chi2_systematic");
+  outfile->Write();
+  outfile->Close();
 
   return 0;
 }
