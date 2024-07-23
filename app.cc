@@ -11,7 +11,7 @@ int main(int argc, char** argv){
   std::cout<<"setting bins"<<std::endl;
   rep->setNbins(100); // number of bins from 0 to 20 GeV
 
-  rep->setInFile("/home/guang/work/theia/readyForCAF_neutrino_swap0.root");
+  rep->setInFile("data/readyForCAF_neutrino_swap0.root");
 
   std::cout<<"setting file"<<std::endl;
   rep->setInFile(rep->getInfile());
