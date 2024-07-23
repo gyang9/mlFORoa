@@ -101,6 +101,7 @@ public:
   void setInFile(std::string infile) {infilePath = infile;}
   void setPullNominal(std::vector<double> v){nominal = v;}
   void setPullUncertainty(std::vector<double> v){uncertainty = v;}
+  void setflux(std::string s, int no);
 
 private:
   std::vector<double> spectrum;
@@ -112,4 +113,6 @@ private:
 
   std::vector<double> nominal;
   std::vector<double> uncertainty;
+
+  TGraph* fflux[10];  
 };  

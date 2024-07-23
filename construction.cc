@@ -27,7 +27,6 @@ void Construction::readSpectrum(){
 }
 
 void Construction::constructData(std::vector<double> v){
-
   TFile* infile = new TFile(infilePath.c_str(), "READ");
   TTree* tree = (TTree*)infile->Get("tree");
   auto h = new TH1F("","",nbin, 0, 20); // in GeV
@@ -46,8 +45,18 @@ void Construction::constructData(std::vector<double> v){
   infile->Close();
 }
 
+void Construction::setflux(std::string s, int no){
+  TFile* infile = new TFile(s.c_str(), "READ");
+  for (int i=0;i<no; i++){
+    fflux[i] = (TGraph*)infile->Get(Form("flux_variation_%d",i));
+  }
+  infile->Close();
+}
+
 std::vector<double> Construction::constructMC(std::vector<double> v){
 
+  if (v.size()> 2) {std::cout<<"BE CAREFUL! YOU ARE USING SPECTRUM WEIGHTING FOR FLUX UNCERTAINTIES!"<<std::endl;
+  }
   TFile* infile = new TFile(infilePath.c_str(), "READ");
   TTree* tree = (TTree*)infile->Get("tree");
   auto h = new TH1F("","",nbin, 0, 20); // in GeV
@@ -55,7 +64,18 @@ std::vector<double> Construction::constructMC(std::vector<double> v){
   tree->SetBranchAddress("recoE_mu", &recoE_mu);
   for (int i=0;i<tree->GetEntries();i++){
     tree->GetEntry(i);
-    h->Fill(v.at(0) + recoE_mu* v.at(1) );
+    double wei = 1;
+    for (int j = 0; j< v.size()-2; j++){
+      if (!fflux[j] || !fflux[j]->Eval(recoE_mu) ){
+        std::cout<<"DID NOT SET UP THE FLUX SYST. CORRECTLY!"<<std::endl;
+	exit(0);
+      }
+
+      //std::cout<<":total event flux weight: "<<wei<<std::endl;
+      wei *= (1 + fflux[j]->Eval(recoE_mu)*v.at(2));
+    }
+    //std::cout<<"total event flux weight: "<<wei<<std::endl;
+    h->Fill(v.at(0) + recoE_mu* v.at(1), wei );
   }
   std::vector<double > spec;
   for (int i=0;i<h->GetNbinsX(); i++){
@@ -91,6 +111,5 @@ double Construction::getPenalty(std::vector<double> v){
   }
   return pen;
 }
-
 
 
