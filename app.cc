@@ -37,13 +37,16 @@ int main(int argc, char** argv){
   // setting up flux systematics
   rep->setflux("../data/flux_uncertainty.root", 10);
 
-  TH2F* h2 = new TH2F("","#chi^{2} map; systematic a; systematic b", 100,0,1, 100,0.5,1.5);
+  ofstream out;
+  out.open("result.dat");
+
+  //TH2F* h2 = new TH2F("","#chi^{2} map; systematic a; systematic b", 100,0,1, 100,0.5,1.5);
   std::cout<<"getting chi2"<<std::endl;
-  for (int i = 0;i<100;i++){
-    for (int j = 0; j< 100; j++){
+  for (int i = 0;i<10;i++){
+    for (int j = 0; j< 10; j++){
       // if you want to add more systematics, be careful, it can be super slow.
       // the first two variations are always energy scale, the next 10 are flux uncertainties
-      for (int k = 0; k< 100; k++){
+      for (int k = 0; k< 2; k++){
 	std::cout<<"looping over "<<i<<" "<<j<<" "<<k<<" "<<std::endl;
 
         double ashift = i*0.01;
@@ -53,16 +56,18 @@ int main(int argc, char** argv){
         std::vector<double> mc_shift = {ashift,bshift, cshift}; // add more shift values here
         std::vector<double> mc_test = rep->constructMC(mc_shift); 
         double chi2 = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
-        h2->SetBinContent(i+1, k+1, chi2);
+        out<<i<<" "<<j<<" "<<k<<" "<<chi2<<endl;
+        //h2->SetBinContent(i+1, k+1, chi2);
       }
     }
   }
-  TFile* outfile = new TFile("output.root","RECREATE");
-  h2->Write("chi2_systematic");
-  outfile->Write();
-  outfile->Close();
+  out.close();
+  //TFile* outfile = new TFile("output.root","RECREATE");
+  //h2->Write("chi2_systematic");
+  //outfile->Write();
+  //outfile->Close();
 
-  th2TOdat(h2, "systematic_variation.dat");
+  //th2TOdat(h2, "systematic_variation.dat");
 
   return 0;
 }
