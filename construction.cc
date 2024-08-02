@@ -55,7 +55,7 @@ void Construction::setflux(std::string s, int no){
 
 std::vector<double> Construction::constructMC(std::vector<double> v){
 
-  if (v.size()> 2) {std::cout<<"BE CAREFUL! YOU ARE USING SPECTRUM WEIGHTING FOR FLUX UNCERTAINTIES!"<<std::endl;
+  if (v.size()> 2) {//std::cout<<"BE CAREFUL! YOU ARE USING SPECTRUM WEIGHTING FOR FLUX UNCERTAINTIES!"<<std::endl;
   }
   TFile* infile = new TFile(infilePath.c_str(), "READ");
   TTree* tree = (TTree*)infile->Get("tree");
