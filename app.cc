@@ -1,7 +1,56 @@
 #include <iostream>
+#include <vector>
+#include <cmath>
+#include <random>
+#include <functional>
+#include <fstream>
 
 #include "construction.hh"
 #include "Util.hh"
+
+// MCMC function using Metropolis-Hastings algorithm
+void run_mcmc(Construction* rep, int iterations, std::ofstream& out) {
+    // Initial values
+    double ashift = 0.0;
+    double bshift = 0.5;
+    double cshift = -0.5;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> uniform_dist(0.0, 1.0);
+    std::normal_distribution<> proposal_dist(0.0, 0.01); // Proposal distribution
+
+    for (int n = 0; n < iterations; ++n) {
+        // Propose new shifts
+        double ashift_new = ashift + proposal_dist(gen);
+        double bshift_new = bshift + proposal_dist(gen);
+        double cshift_new = cshift + proposal_dist(gen);
+
+        // Construct MC test with proposed shifts
+        std::vector<double> mc_shift_new = {ashift_new, bshift_new, cshift_new};
+        std::vector<double> mc_test_new = rep->constructMC(mc_shift_new);
+        double chi2_new = rep->getChi2(mc_test_new) + rep->getPenalty(mc_shift_new);
+
+        // Construct MC test with current shifts
+        std::vector<double> mc_shift = {ashift, bshift, cshift};
+        std::vector<double> mc_test = rep->constructMC(mc_shift);
+        double chi2_current = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
+
+        // Calculate acceptance ratio
+        double acceptance_ratio = std::exp(-0.5 * (chi2_new - chi2_current));
+
+        // Accept or reject the new state
+        if (uniform_dist(gen) < acceptance_ratio) {
+            ashift = ashift_new;
+            bshift = bshift_new;
+            cshift = cshift_new;
+            chi2_current = chi2_new;
+        }
+
+        // Output the results
+        out << ashift << " " << bshift << " " << cshift << " " << chi2_current << std::endl;
+    }
+}
 
 int main(int argc, char** argv){
 
@@ -37,6 +86,7 @@ int main(int argc, char** argv){
   // setting up flux systematics
   rep->setflux("../data/flux_uncertainty.root", 10);
 
+/*
   ofstream out;
   out.open("result.dat");
 
@@ -62,6 +112,16 @@ int main(int argc, char** argv){
     }
   }
   out.close();
+*/
+
+  std::ofstream out("mcmc_output.txt");
+
+  int iterations = 10000; // Number of MCMC iterations
+  run_mcmc(rep, iterations, out);
+
+  out.close();
+  return 0;
+
   //TFile* outfile = new TFile("output.root","RECREATE");
   //h2->Write("chi2_systematic");
   //outfile->Write();
@@ -69,6 +129,6 @@ int main(int argc, char** argv){
 
   //th2TOdat(h2, "systematic_variation.dat");
 
-  return 0;
+  //return 0;
 }
 
