@@ -8,6 +8,7 @@
 #include <map>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
 
 #include "construction.hh"
 #include "Util.hh"
@@ -132,9 +133,16 @@ int main(int argc, char** argv){
   else{
 
     std::ofstream out("mcmc_output.txt");
+
+    auto start_time = std::chrono::high_resolution_clock::now();
     run_mcmc(rep, iterations, out);
 
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time = end_time - start_time;
+
     out.close();
+
+    std::cout << "MCMC completed in " << elapsed_time.count() << " seconds." << std::endl;
   }
 
   //TFile* outfile = new TFile("output.root","RECREATE");
