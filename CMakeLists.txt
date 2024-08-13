@@ -16,6 +16,11 @@ file(GLOB DAT_FILES
 
 file(COPY ${DAT_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
+file(GLOB CFG_FILES
+    "*.cfg")
+
+file(COPY ${CFG_FILES} DESTINATION ${PROJECT_BINARY_DIR})
+
 add_executable(app app.cc ${sources} ${headers})
 target_link_libraries(app ${ROOT_LIBRARIES})
 

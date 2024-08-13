@@ -4,6 +4,10 @@
 #include <random>
 #include <functional>
 #include <fstream>
+#include <string>
+#include <map>
+#include <sstream>
+#include <algorithm>
 
 #include "construction.hh"
 #include "Util.hh"
@@ -86,41 +90,46 @@ int main(int argc, char** argv){
   // setting up flux systematics
   rep->setflux("../data/flux_uncertainty.root", 10);
 
-/*
-  ofstream out;
-  out.open("result.dat");
+  std::map<std::string, std::string> config = read_config("config.cfg");
+  bool run_mcmc_flag = (config["run_mcmc"] == "true");
+  int iterations = std::stoi(config["iterations"]);
 
-  //TH2F* h2 = new TH2F("","#chi^{2} map; systematic a; systematic b", 100,0,1, 100,0.5,1.5);
-  std::cout<<"getting chi2"<<std::endl;
-  for (int i = 0;i<10;i++){
-    for (int j = 0; j< 10; j++){
-      // if you want to add more systematics, be careful, it can be super slow.
-      // the first two variations are always energy scale, the next 10 are flux uncertainties
-      for (int k = 0; k< 2; k++){
-	std::cout<<"looping over "<<i<<" "<<j<<" "<<k<<" "<<std::endl;
+  if (! run_mcmc_flag){
+    ofstream out;
+    out.open("result.dat");
 
-        double ashift = i*0.01;
-        double bshift = 0.5 + j*0.01;
-	double cshift = -0.5 + k*0.01;
-	// if you have more loops, you need to add more shifts
-        std::vector<double> mc_shift = {ashift,bshift, cshift}; // add more shift values here
-        std::vector<double> mc_test = rep->constructMC(mc_shift); 
-        double chi2 = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
-        out<<i<<" "<<j<<" "<<k<<" "<<chi2<<endl;
-        //h2->SetBinContent(i+1, k+1, chi2);
+    //TH2F* h2 = new TH2F("","#chi^{2} map; systematic a; systematic b", 100,0,1, 100,0.5,1.5);
+    std::cout<<"getting chi2"<<std::endl;
+    for (int i = 0;i<10;i++){
+      for (int j = 0; j< 10; j++){
+        // if you want to add more systematics, be careful, it can be super slow.
+        // the first two variations are always energy scale, the next 10 are flux uncertainties
+        for (int k = 0; k< 2; k++){
+	  std::cout<<"looping over "<<i<<" "<<j<<" "<<k<<" "<<std::endl;
+
+          double ashift = i*0.01;
+          double bshift = 0.5 + j*0.01;
+	  double cshift = -0.5 + k*0.01;
+	  // if you have more loops, you need to add more shifts
+          std::vector<double> mc_shift = {ashift,bshift, cshift}; // add more shift values here
+          std::vector<double> mc_test = rep->constructMC(mc_shift); 
+          double chi2 = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
+          out<<i<<" "<<j<<" "<<k<<" "<<chi2<<endl;
+          //h2->SetBinContent(i+1, k+1, chi2);
+        }
       }
     }
+    out.close();
   }
-  out.close();
-*/
+  else{
 
-  std::ofstream out("mcmc_output.txt");
+    std::ofstream out("mcmc_output.txt");
 
-  int iterations = 10000; // Number of MCMC iterations
-  run_mcmc(rep, iterations, out);
+    int iterations = 10000; // Number of MCMC iterations
+    run_mcmc(rep, iterations, out);
 
-  out.close();
-  return 0;
+    out.close();
+  }
 
   //TFile* outfile = new TFile("output.root","RECREATE");
   //h2->Write("chi2_systematic");
@@ -129,6 +138,6 @@ int main(int argc, char** argv){
 
   //th2TOdat(h2, "systematic_variation.dat");
 
-  //return 0;
+  return 0;
 }
 
