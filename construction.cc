@@ -55,7 +55,7 @@ void Construction::setflux(std::string s, int no){
 
 std::vector<double> Construction::constructMC(std::vector<double> v){
 
-  if (v.size()> 2) {std::cout<<"BE CAREFUL! YOU ARE USING SPECTRUM WEIGHTING FOR FLUX UNCERTAINTIES!"<<std::endl;
+  if (v.size()> 2) {//std::cout<<"BE CAREFUL! YOU ARE USING SPECTRUM WEIGHTING FOR FLUX UNCERTAINTIES!"<<std::endl;
   }
   TFile* infile = new TFile(infilePath.c_str(), "READ");
   TTree* tree = (TTree*)infile->Get("tree");
@@ -72,7 +72,7 @@ std::vector<double> Construction::constructMC(std::vector<double> v){
       }
 
       //std::cout<<":total event flux weight: "<<wei<<std::endl;
-      wei *= (1 + fflux[j]->Eval(recoE_mu)*v.at(2));
+      wei *= (1 + fflux[j]->Eval(recoE_mu)*v.at(j+2));
     }
     //std::cout<<"total event flux weight: "<<wei<<std::endl;
     h->Fill(v.at(0) + recoE_mu* v.at(1), wei );

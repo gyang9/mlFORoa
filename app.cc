@@ -18,6 +18,9 @@ void run_mcmc(Construction* rep, int iterations, std::ofstream& out) {
     double ashift = 0.0;
     double bshift = 0.5;
     double cshift = -0.5;
+    double dshift = -0.5;
+    double eshift = -0.5;
+    double gshift = -0.5;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -29,14 +32,18 @@ void run_mcmc(Construction* rep, int iterations, std::ofstream& out) {
         double ashift_new = ashift + proposal_dist(gen);
         double bshift_new = bshift + proposal_dist(gen);
         double cshift_new = cshift + proposal_dist(gen);
+        double dshift_new = dshift + proposal_dist(gen);
+        double eshift_new = eshift + proposal_dist(gen);
+        double fshift_new = fshift + proposal_dist(gen);
+        double gshift_new = gshift + proposal_dist(gen);
 
         // Construct MC test with proposed shifts
-        std::vector<double> mc_shift_new = {ashift_new, bshift_new, cshift_new};
+        std::vector<double> mc_shift_new = {ashift_new, bshift_new, cshift_new, dshift_new, eshift_new, fshift_new, gshift_new};
         std::vector<double> mc_test_new = rep->constructMC(mc_shift_new);
         double chi2_new = rep->getChi2(mc_test_new) + rep->getPenalty(mc_shift_new);
 
         // Construct MC test with current shifts
-        std::vector<double> mc_shift = {ashift, bshift, cshift};
+        std::vector<double> mc_shift = {ashift, bshift, cshift, dshift, eshift, fshift, gshift};
         std::vector<double> mc_test = rep->constructMC(mc_shift);
         double chi2_current = rep->getChi2(mc_test) + rep->getPenalty(mc_shift);
 
@@ -124,8 +131,6 @@ int main(int argc, char** argv){
   else{
 
     std::ofstream out("mcmc_output.txt");
-
-    int iterations = 10000; // Number of MCMC iterations
     run_mcmc(rep, iterations, out);
 
     out.close();
