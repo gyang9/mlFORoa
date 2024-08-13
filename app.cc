@@ -20,6 +20,7 @@ void run_mcmc(Construction* rep, int iterations, std::ofstream& out) {
     double cshift = -0.5;
     double dshift = -0.5;
     double eshift = -0.5;
+    double fshift = -0.5;
     double gshift = -0.5;
 
     std::random_device rd;
