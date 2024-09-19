@@ -75,7 +75,10 @@ std::vector<double> Construction::constructMC(std::vector<double> v){
       wei *= (1 + fflux[j]->Eval(recoE_mu)*v.at(2));
     }
     //std::cout<<"total event flux weight: "<<wei<<std::endl;
-    h->Fill(v.at(0) + recoE_mu* v.at(1), wei );
+    if (v.at(0) + recoE_mu* v.at(1) > 0)
+      h->Fill(v.at(0) + recoE_mu* v.at(1), wei );
+    else
+      h->Fill(0.001, wei );
   }
   std::vector<double > spec;
   for (int i=0;i<h->GetNbinsX(); i++){
